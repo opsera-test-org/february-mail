@@ -136,6 +136,7 @@ jobs:
     if: always() && needs.build-image.result == 'success' && (needs.grype-scan.result == 'success' || vars.GRYPE_MODE == 'warn')
     outputs:
       ecr_uri: ${{ steps.ecr.outputs.ecr_uri }}
+      image_tag: ${{ needs.build-image.outputs.image_tag }}
     steps:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -190,7 +191,7 @@ jobs:
       - name: Update Kustomize Overlay
         run: |
           KUSTOMIZATION=".opsera-${APP_NAME}/k8s/overlays/${ENV}/kustomization.yaml"
-          IMAGE_TAG="${{ needs.build-image.outputs.image_tag }}"
+          IMAGE_TAG="${{ needs.push-to-ecr.outputs.image_tag }}"
           ECR_URI="${{ needs.push-to-ecr.outputs.ecr_uri }}"
 
           # Pull first (RULE 196)
