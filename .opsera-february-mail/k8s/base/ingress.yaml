@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: february-mail
+  labels:
+    app: february-mail
+    managed-by: opsera-c2c
+  annotations:
+    # RULE 105: BOTH ingressClassName AND annotation required
+    kubernetes.io/ingress.class: "nginx"
+    # Security headers
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"  # HTTP only
+    # CORS (if needed for SPA)
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: february-mail-dev.agent.opsera.dev
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: february-mail
+                port:
+                  name: http
+  # RULE 83-84: NO TLS/cert-manager (handled at ingress controller level)

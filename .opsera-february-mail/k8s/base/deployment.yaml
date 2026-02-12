@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: february-mail
+  labels:
+    app: february-mail
+    managed-by: opsera-c2c
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: february-mail
+  template:
+    metadata:
+      labels:
+        app: february-mail
+    spec:
+      serviceAccountName: february-mail-sa
+      imagePullSecrets:
+        - name: ecr-pull-secret
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101  # nginx user
+        runAsGroup: 101
+        fsGroup: 101
+      containers:
+        - name: february-mail
+          image: all-is-well  # Replaced by Kustomize image transformer
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 2
+            timeoutSeconds: 3
+            failureThreshold: 30

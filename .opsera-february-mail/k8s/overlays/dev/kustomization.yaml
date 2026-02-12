@@ -1,0 +1,33 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: opsera-february-mail-dev
+
+resources:
+  - ../../base
+  - namespace.yaml
+
+# RULE 194: Kustomize Image Transformer Pattern
+# Base deployment.yaml uses "all-is-well" as image name
+# This transformer replaces it with actual ECR URI and tag
+# CI/CD workflow updates newName and newTag via sed
+images:
+  - name: all-is-well
+    newName: PLACEHOLDER_ECR_URI  # Updated by CI/CD Stage 6
+    newTag: latest                 # Updated by CI/CD Stage 6
+
+# Environment-specific labels (RULE 106)
+labels:
+  - includeSelectors: false
+    pairs:
+      environment: dev
+
+# Environment-specific patches
+patches:
+  - target:
+      kind: Ingress
+      name: february-mail
+    patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: february-mail-dev.agent.opsera.dev

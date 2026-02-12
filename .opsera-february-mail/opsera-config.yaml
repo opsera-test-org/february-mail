@@ -1,0 +1,152 @@
+# Opsera Code-to-Cloud Enterprise Configuration
+# Single source of truth for deployment settings
+# Generated: 2026-02-12
+
+metadata:
+  version: "0.930"
+  generated_at: "2026-02-12T00:00:00Z"
+  setup_mode: "quick"
+
+application:
+  name: "february-mail"
+  tenant: "opsera"
+  description: "Vite + React + TypeScript Application"
+  repository: "opsera-test-org/february-mail"
+
+cloud:
+  provider: "aws"
+  region: "us-west-2"
+  region_short: "usw2"
+  aws_account_id: "${AWS_ACCOUNT_ID}"  # Resolved dynamically in workflows
+
+clusters:
+  hub:
+    name: "argocd-usw2"
+    server: "argocd-usw2.agent.opsera.dev"
+    context: "hub"
+  spoke:
+    name: "opsera-usw2-np"
+    domain: "agent.opsera.dev"
+    context: "spoke"
+
+environments:
+  dev:
+    enabled: true
+    namespace: "opsera-february-mail-dev"
+    deployment_strategy: "rolling"
+    branch: "main"
+    replicas:
+      min: 2
+      max: 5
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "128Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+    ingress:
+      enabled: true
+      host: "february-mail-dev.agent.opsera.dev"
+      tls: false  # Handled at ingress controller level
+    autoscaling:
+      enabled: true
+      target_cpu_percent: 80
+
+build:
+  framework: "vite"
+  language: "typescript"
+  package_manager: "npm"
+  build_command: "npm run build"
+  build_output: "dist"
+  port: 8080
+  health_check_path: "/health"
+
+container:
+  registry: "ecr"
+  repository: "opsera/february-mail"
+  base_image: "nginxinc/nginx-unprivileged:alpine"
+  tag_format: "${ENV}-${SHORT_SHA}-${TIMESTAMP}"
+  tag_immutable: true
+
+security:
+  scanning:
+    gitleaks:
+      enabled: true
+      mode: "warn"  # warn or block
+    grype:
+      enabled: true
+      mode: "warn"  # warn or block
+      severity_threshold: "high"
+    sonarqube:
+      enabled: false
+
+integrations:
+  slack:
+    enabled: false
+  jira:
+    enabled: false
+  prometheus:
+    enabled: false
+  newrelic:
+    enabled: false
+  datadog:
+    enabled: false
+
+github:
+  workflows:
+    bootstrap: "1-bootstrap-infrastructure-february-mail.yaml"
+    cicd_dev: "2-ci-build-scan-push-february-mail-dev.yaml"
+  secrets_required:
+    - "GH_PAT"
+    - "AWS_ACCESS_KEY_ID"
+    - "AWS_SECRET_ACCESS_KEY"
+  variables_required:
+    - "TENANT"
+    - "GITLEAKS_MODE"
+    - "GRYPE_MODE"
+
+argocd:
+  sync_policy:
+    automated: false  # Manual sync initially
+    self_heal: true
+    prune: true
+  retry:
+    limit: 5
+    backoff:
+      duration: "5s"
+      factor: 2
+      max_duration: "3m"
+
+deployment:
+  timeline:
+    bootstrap: "5-7 minutes"
+    cicd_first: "12-15 minutes"
+    cicd_cached: "8-10 minutes"
+
+  pipeline_stages:
+    - name: "security-scan"
+      tool: "gitleaks"
+      blocking: false
+    - name: "build-image"
+      tool: "docker"
+      cache: true
+    - name: "grype-scan"
+      tool: "grype"
+      blocking: false
+    - name: "push-to-ecr"
+      registry: "ecr"
+    - name: "refresh-ecr-secret"
+      cluster: "spoke"
+    - name: "update-manifests"
+      tool: "kustomize"
+    - name: "argocd-refresh"
+      cluster: "hub"
+    - name: "argocd-sync"
+      cluster: "hub"
+      wait: true
+    - name: "verify-deployment"
+      cluster: "spoke"
+      health_checks: true
+    - name: "deployment-landscape"
+      publish: true
