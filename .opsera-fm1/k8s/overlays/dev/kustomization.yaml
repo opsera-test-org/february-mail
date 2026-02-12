@@ -10,7 +10,7 @@ resources:
 images:
   - name: fm1  # Matches base deployment image name
     newName: 792373136340.dkr.ecr.us-west-2.amazonaws.com/opsera/fm1
-    newTag: dev-058febe0-20260212124111
+    newTag: dev-1a404227-20260212124438
 
 # Environment-specific patches
 patches:
