@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: fbb1
+  namespace: opsera-fbb1-dev
+  labels:
+    app: fbb1
+    tenant: opsera
+    managed-by: opsera-c2c
+spec:
+  type: ClusterIP
+  selector:
+    app: fbb1
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+      protocol: TCP

@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fbb1
+  namespace: opsera-fbb1-dev
+  labels:
+    app: fbb1
+    tenant: opsera
+    managed-by: opsera-c2c
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: fbb1
+  template:
+    metadata:
+      labels:
+        app: fbb1
+        tenant: opsera
+    spec:
+      serviceAccountName: fbb1-sa
+      imagePullSecrets:
+        - name: ecr-pull-secret
+      containers:
+        - name: fbb1
+          image: fbb1:latest
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: fbb1-config
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 101
+            runAsGroup: 101
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
