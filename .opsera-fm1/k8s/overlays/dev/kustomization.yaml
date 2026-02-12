@@ -9,8 +9,8 @@ resources:
 # Image transformer - CI/CD will update newName and newTag (RULE 194)
 images:
   - name: fm1  # Matches base deployment image name
-    newName: fm1  # Will be replaced by CI/CD with actual ECR URI
-    newTag: latest  # Will be replaced by CI/CD with actual image tag
+    newName: 792373136340.dkr.ecr.us-west-2.amazonaws.com/opsera/fm1
+    newTag: dev-058febe0-20260212124111
 
 # Environment-specific patches
 patches:
