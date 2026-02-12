@@ -9,7 +9,7 @@ resources:
 images:
   - name: fbb11
     newName: PLACEHOLDER_ECR_URI  # Will be replaced by CI/CD with actual ECR URI
-    newTag: latest  # Will be replaced by CI/CD with actual image tag
+    newTag: dev-1ea8d8bd-20260212195419
 
 labels:
   - includeSelectors: false
