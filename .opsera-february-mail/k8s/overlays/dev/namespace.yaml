@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: opsera-february-mail-dev
-  labels:
-    app: february-mail
-    environment: dev
-    tenant: opsera
-    managed-by: opsera-c2c
