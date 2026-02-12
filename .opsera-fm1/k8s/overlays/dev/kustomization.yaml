@@ -1,0 +1,23 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: opsera-fm1-dev
+
+resources:
+  - ../../base
+
+# Image transformer - CI/CD will update newName and newTag (RULE 194)
+images:
+  - name: fm1  # Matches base deployment image name
+    newName: fm1  # Will be replaced by CI/CD with actual ECR URI
+    newTag: latest  # Will be replaced by CI/CD with actual image tag
+
+# Environment-specific patches
+patches:
+  - target:
+      kind: Ingress
+      name: fm1
+    patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: fm1-dev.agent.opsera.dev
