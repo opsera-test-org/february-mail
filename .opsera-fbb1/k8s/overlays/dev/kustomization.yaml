@@ -15,4 +15,4 @@ labels:
 images:
   - name: fbb1
     newName: 792373136340.dkr.ecr.us-west-2.amazonaws.com/opsera/fbb1
-    newTag: 
+    newTag: dev-0971bfbf-20260212184642
