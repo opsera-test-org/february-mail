@@ -1,0 +1,40 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: opsera-fbb11-dev
+
+resources:
+  - ../../base
+
+images:
+  - name: fbb11
+    newName: PLACEHOLDER_ECR_URI  # Will be replaced by CI/CD with actual ECR URI
+    newTag: latest  # Will be replaced by CI/CD with actual image tag
+
+labels:
+  - includeSelectors: false
+    pairs:
+      environment: dev
+      deployment-strategy: rolling
+
+replicas:
+  - name: fbb11
+    count: 2
+
+patches:
+  - patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: "100m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: "128Mi"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: "500m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: "512Mi"
+    target:
+      kind: Deployment
+      name: fbb11

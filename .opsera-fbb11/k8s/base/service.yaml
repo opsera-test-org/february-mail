@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: fbb11
+  namespace: opsera-fbb11-dev
+  labels:
+    app: fbb11
+    tenant: opsera
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP
+  selector:
+    app: fbb11

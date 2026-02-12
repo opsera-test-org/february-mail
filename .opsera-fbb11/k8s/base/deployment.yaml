@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fbb11
+  namespace: opsera-fbb11-dev
+  labels:
+    app: fbb11
+    tenant: opsera
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: fbb11
+  template:
+    metadata:
+      labels:
+        app: fbb11
+        tenant: opsera
+    spec:
+      serviceAccountName: fbb11-sa
+      imagePullSecrets:
+        - name: ecr-pull-secret
+      containers:
+        - name: fbb11
+          image: fbb11:latest  # Will be replaced by Kustomize
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: PORT
+              value: "8080"
+          envFrom:
+            - configMapRef:
+                name: fbb11-config
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 101
+            runAsGroup: 101
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: false
