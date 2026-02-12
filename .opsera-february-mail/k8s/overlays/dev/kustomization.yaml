@@ -14,7 +14,7 @@ resources:
 images:
   - name: all-is-well
     newName: 792373136340.dkr.ecr.us-west-2.amazonaws.com/opsera/february-mail
-    newTag: dev-109a741c-20260212104551
+    newTag: dev-058febe0-20260212124113
 
 # Environment-specific labels (RULE 106)
 labels:
