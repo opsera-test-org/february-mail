@@ -13,8 +13,8 @@ resources:
 # CI/CD workflow updates newName and newTag via sed
 images:
   - name: all-is-well
-    newName: PLACEHOLDER_ECR_URI  # Updated by CI/CD Stage 6
-    newTag: latest                 # Updated by CI/CD Stage 6
+    newName: 792373136340.dkr.ecr.us-west-2.amazonaws.com/opsera/february-mail
+    newTag: dev-109a741c-20260212104551
 
 # Environment-specific labels (RULE 106)
 labels:
