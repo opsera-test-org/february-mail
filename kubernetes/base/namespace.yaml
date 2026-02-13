@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: opsera-demo-mail-dev
+  labels:
+    app: demo-mail
+    environment: dev
+    tenant: opsera

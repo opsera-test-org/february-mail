@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-mail
+  namespace: opsera-demo-mail-dev
+  labels:
+    app: demo-mail
+    tenant: opsera
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: demo-mail
+  template:
+    metadata:
+      labels:
+        app: demo-mail
+        tenant: opsera
+    spec:
+      serviceAccountName: demo-mail
+      imagePullSecrets:
+        - name: ecr-pull-secret
+      containers:
+        - name: demo-mail
+          image: demo-mail:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 101
+            runAsGroup: 101
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop:
+                - ALL
+      securityContext:
+        fsGroup: 101

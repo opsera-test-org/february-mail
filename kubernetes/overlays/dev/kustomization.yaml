@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: opsera-demo-mail-dev
+
+resources:
+  - ../../base
+
+patches:
+  - path: deployment-patch.yaml
+
+images:
+  - name: demo-mail
+    newName: demo-mail
+    newTag: latest
+
+commonLabels:
+  environment: dev
