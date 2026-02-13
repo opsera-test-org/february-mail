@@ -4,14 +4,12 @@ kind: Kustomization
 namespace: opsera-ffbb1-dev
 
 resources:
-  - ../../base
+- ../../base
 
 images:
-  - name: ffbb1
-    newName: PLACEHOLDER_ECR_URI
-    newTag: latest
+- name: ffbb1
+  newName: 792373136340.dkr.ecr.us-west-2.amazonaws.com/opsera/ffbb1
 
 labels:
-  - includeSelectors: false
-    pairs:
-      environment: dev
+- pairs:
+    environment: dev
