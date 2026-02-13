@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: opsera-ffbb1-dev
-  labels:
-    app: ffbb1
-    tenant: opsera
-    environment: dev
-    managed-by: opsera-c2c
